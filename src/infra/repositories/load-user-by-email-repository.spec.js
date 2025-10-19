@@ -38,8 +38,8 @@ describe('LoadUserByEmail Repository', () => {
     })
     const user = await sut.load('valid_email@mail.com')
     expect(user).toEqual({
-      _id: fakeUser.ops[0]._id,
-      password: fakeUser.ops[0].password
+      _id: fakeUser.insertedId,
+      password: 'hashed_password'
     })
   })
 

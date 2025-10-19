@@ -16,4 +16,9 @@ describe('Mongo Helper', () => {
     await sut.getCollection('users')
     expect(sut.db).toBeTruthy()
   })
+
+  test('Should not throw when disconnect() is called without client', async () => {
+    sut.client = null
+    await expect(sut.disconnect()).resolves.not.toThrow()
+  })
 })

@@ -1,0 +1,46 @@
+services:
+  # MongoDB Database
+  mongodb:
+    image: mongo:7.0
+    container_name: api-node-tdd-clean-mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin123
+      MONGO_INITDB_DATABASE: clean-node-api
+    volumes:
+      - mongodb_data:/data/db
+      - ./docker/mongodb/init:/docker-entrypoint-initdb.d
+    networks:
+      - api-network
+
+  # API Node.js (opcional - para desenvolvimento completo)
+  api:
+    build: .
+    container_name: api-node-tdd-clean-api
+    restart: unless-stopped
+    ports:
+      - "5858:5858"
+    environment:
+      MONGO_URL: mongodb://admin:admin123@mongodb:27017/clean-node-api?authSource=admin
+      TOKEN_SECRET: my-super-secret-token
+      PORT: 5858
+      NODE_ENV: development
+    depends_on:
+      - mongodb
+    volumes:
+      - .:/app
+      - /app/node_modules
+    networks:
+      - api-network
+    profiles:
+      - full-stack
+
+volumes:
+  mongodb_data:
+
+networks:
+  api-network:
+    driver: bridge

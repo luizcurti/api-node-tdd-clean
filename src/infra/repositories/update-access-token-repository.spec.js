@@ -22,7 +22,7 @@ describe('UpdateAccessToken Repository', () => {
       state: 'any_state',
       password: 'hashed_password'
     })
-    fakeUserId = fakeUser.ops[0]._id
+    fakeUserId = fakeUser.insertedId
   })
 
   afterAll(async () => {
