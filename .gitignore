@@ -4,7 +4,6 @@
 /coverage
 /logs
 *.log
-package-lock.json
 yarn.lock
 .DS_Store
 docker/mongodb/data/
