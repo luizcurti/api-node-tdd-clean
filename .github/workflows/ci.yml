@@ -43,12 +43,7 @@ jobs:
       run: npm run lint
       
     - name: Wait for MongoDB
-      run: |
-        until mongosh --host localhost:27017 -u admin -p admin123 --authenticationDatabase admin --eval "db.runCommand({ping: 1})" >/dev/null 2>&1; do
-          echo "Waiting for MongoDB..."
-          sleep 2
-        done
-        echo "MongoDB is ready!"
+      run: sleep 10
       
     - name: Run all tests
       run: npm test
