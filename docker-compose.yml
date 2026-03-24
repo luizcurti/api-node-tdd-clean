@@ -15,6 +15,12 @@ services:
       - ./docker/mongodb/init:/docker-entrypoint-initdb.d
     networks:
       - api-network
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "--eval", "db.adminCommand('ping').ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
 
   # API Node.js (opcional - para desenvolvimento completo)
   api:

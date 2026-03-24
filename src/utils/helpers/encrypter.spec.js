@@ -1,5 +1,12 @@
 jest.mock('bcrypt', () => ({
   isValid: true,
+  hashedValue: 'hashed_value',
+
+  async hash (value, rounds) {
+    this.value = value
+    this.rounds = rounds
+    return this.hashedValue
+  },
 
   async compare (value, hash) {
     this.value = value
@@ -17,29 +24,51 @@ const makeSut = () => {
 }
 
 describe('Encrypter', () => {
-  test('Should return true if bcrypt returns true', async () => {
-    const sut = makeSut()
-    const isValid = await sut.compare('any_value', 'hashed_value')
-    expect(isValid).toBe(true)
+  describe('hash()', () => {
+    test('Should return a hashed value', async () => {
+      const sut = makeSut()
+      const hashed = await sut.hash('any_value')
+      expect(hashed).toBe(bcrypt.hashedValue)
+    })
+
+    test('Should call bcrypt.hash with correct values', async () => {
+      const sut = makeSut()
+      await sut.hash('any_value')
+      expect(bcrypt.value).toBe('any_value')
+      expect(bcrypt.rounds).toBe(12)
+    })
+
+    test('Should throw if no value is provided to hash', async () => {
+      const sut = makeSut()
+      await expect(sut.hash()).rejects.toThrow(new MissingParamError('value'))
+    })
   })
 
-  test('Should return false if bcrypt returns false', async () => {
-    const sut = makeSut()
-    bcrypt.isValid = false
-    const isValid = await sut.compare('any_value', 'hashed_value')
-    expect(isValid).toBe(false)
-  })
+  describe('compare()', () => {
+    test('Should return true if bcrypt returns true', async () => {
+      const sut = makeSut()
+      const isValid = await sut.compare('any_value', 'hashed_value')
+      expect(isValid).toBe(true)
+    })
 
-  test('Should call bcrypt with correct values', async () => {
-    const sut = makeSut()
-    await sut.compare('any_value', 'hashed_value')
-    expect(bcrypt.value).toBe('any_value')
-    expect(bcrypt.hash).toBe('hashed_value')
-  })
+    test('Should return false if bcrypt returns false', async () => {
+      const sut = makeSut()
+      bcrypt.isValid = false
+      const isValid = await sut.compare('any_value', 'hashed_value')
+      expect(isValid).toBe(false)
+    })
 
-  test('Should throw if no params are provided', async () => {
-    const sut = makeSut()
-    expect(sut.compare()).rejects.toThrow(new MissingParamError('value'))
-    expect(sut.compare('any_value')).rejects.toThrow(new MissingParamError('hash'))
+    test('Should call bcrypt with correct values', async () => {
+      const sut = makeSut()
+      await sut.compare('any_value', 'hashed_value')
+      expect(bcrypt.value).toBe('any_value')
+      expect(bcrypt.hash).toBe('hashed_value')
+    })
+
+    test('Should throw if no params are provided', async () => {
+      const sut = makeSut()
+      await expect(sut.compare()).rejects.toThrow(new MissingParamError('value'))
+      await expect(sut.compare('any_value')).rejects.toThrow(new MissingParamError('hash'))
+    })
   })
 })

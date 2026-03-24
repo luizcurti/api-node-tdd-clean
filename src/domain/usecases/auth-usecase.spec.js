@@ -53,7 +53,7 @@ const makeLoadUserByEmailRepository = () => {
   }
   const loadUserByEmailRepositorySpy = new LoadUserByEmailRepositorySpy()
   loadUserByEmailRepositorySpy.user = {
-    id: 'any_id',
+    _id: 'any_id',
     password: 'hashed_password'
   }
   return loadUserByEmailRepositorySpy
